@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: Trello Scrum
+    description: "API Trello Scrum"
+    version: 0.0.1
+  banner:
+    charset: UTF-8
+    location: banner.txt
