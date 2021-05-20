@@ -3,6 +3,11 @@ spring:
     name: Trello Scrum
     description: "API Trello Scrum"
     version: 0.0.1
+    jwt:
+      secret: TQczCdDxCAkbARkEYhXqDRSNe5qBV3S2jreQfKbQx86KKX66y52h8
+      timeToExpire:
+        token: 600
+        refreshToken: 86400
   banner:
     charset: UTF-8
     location: banner.txt
