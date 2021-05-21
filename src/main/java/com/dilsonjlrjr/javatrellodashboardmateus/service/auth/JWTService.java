@@ -1,4 +1,4 @@
-package com.dilsonjlrjr.javatrellodashboardmateus.service;
+package com.dilsonjlrjr.javatrellodashboardmateus.service.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,17 +18,14 @@ public class JWTService {
     private static final String CLAIM_EXP = "exp";
     private static final String CLAIM_TYP = "typ";
 
+    private static final String TYPE_TOKEN_TOKEN = "token";
+    private static final String TYPE_TOKEN_REFRESH = "refresh";
+
     private final String secret;
 
-    private final Integer tokenTimeToExpire;
-    private final Integer refreshTokenTimeToExpire;
 
-    public JWTService(@Value("${spring.application.jwt.secret}") String secret,
-                      @Value("${spring.application.jwt.timeToExpire.token}") Integer tokenTimeToExpire,
-                      @Value("${spring.application.jwt.timeToExpire.refreshToken}") Integer refreshTokenTimeToExpire) {
+    public JWTService(@Value("${spring.application.jwt.secret}") String secret) {
         this.secret = secret;
-        this.tokenTimeToExpire = tokenTimeToExpire;
-        this.refreshTokenTimeToExpire = refreshTokenTimeToExpire;
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -36,9 +33,12 @@ public class JWTService {
         return claimsResolver.apply(claims);
     }
 
-    private String getExp(Integer timeExpiration) {
-        LocalDateTime nowDateTime = LocalDateTime.now();
-        return String.valueOf(nowDateTime.plusMinutes(timeExpiration).atZone(ZoneId.systemDefault()).toEpochSecond());
+    public Object getClaimFromToken(String token, String name) {
+        final Claims claims = getAllClaimsFromToken(token);
+        if (claims.containsKey(name))
+            return claims.get(name);
+
+        return "";
     }
 
     //para retornar qualquer informação do token nos iremos precisar da secret key
@@ -50,20 +50,27 @@ public class JWTService {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String doCreateToken(String subject) {
+    private String doConvertNowDateTimeToEpochSecond(Integer plusTime) {
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        return String.valueOf(nowDateTime.plusMinutes(plusTime).atZone(ZoneId.systemDefault()).toEpochSecond());
+    }
+
+    public String doCreateToken(String subject, String hashSession, Integer tokenTimeToExpire) {
         return Jwts.builder()
                 .signWith(doGenerateSignedKey())
-                .claim(CLAIM_EXP, getExp(tokenTimeToExpire))
-                .claim(CLAIM_TYP, "token")
+                .setId(hashSession)
+                .claim(CLAIM_EXP, doConvertNowDateTimeToEpochSecond(tokenTimeToExpire))
+                .claim(CLAIM_TYP, TYPE_TOKEN_TOKEN)
                 .setSubject(subject)
                 .compact();
     }
 
-    public String doCreateRefreshToken(String subject) {
+    public String doCreateRefreshToken(String subject, String hashSession, Integer refreshTokenTimeToExpire) {
         return Jwts.builder()
                 .signWith(doGenerateSignedKey())
-                .claim(CLAIM_EXP, getExp(refreshTokenTimeToExpire))
-                .claim(CLAIM_TYP, "refresh")
+                .setId(hashSession)
+                .claim(CLAIM_EXP, doConvertNowDateTimeToEpochSecond(refreshTokenTimeToExpire))
+                .claim(CLAIM_TYP, TYPE_TOKEN_REFRESH)
                 .setSubject(subject)
                 .compact();
     }

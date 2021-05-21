@@ -23,6 +23,8 @@ public class User implements UserDetails {
 
     private String refreshToken;
 
+    private String hashSession;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(() -> "admin");

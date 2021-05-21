@@ -1,12 +1,20 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.config;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumMainControllerAdviceCode;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumMainControllerAdviceMessage;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.HttpErrorDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.User;
-import com.dilsonjlrjr.javatrellodashboardmateus.service.JWTService;
+import com.dilsonjlrjr.javatrellodashboardmateus.service.auth.JWTService;
 import com.dilsonjlrjr.javatrellodashboardmateus.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -21,10 +29,11 @@ import java.io.IOException;
 @Configuration
 public class JWTFilterRequestConfig extends OncePerRequestFilter {
 
-    private static String HEADER_BEARER = "Bearer ";
-
     private final UserService userService;
     private final JWTService jwtService;
+
+    private static final String HEADER_BEARER = "Bearer ";
+    private static final String TYPE_TOKEN = "token";
 
     @Autowired
     public JWTFilterRequestConfig(UserService userService,
@@ -39,19 +48,49 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
 
         String headerAuthorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (headerAuthorization != null && headerAuthorization.startsWith(HEADER_BEARER)) {
-            String token = headerAuthorization.substring(7);
-            String username = jwtService.getClaimFromToken(token, Claims::getSubject);
+        try {
+            if (headerAuthorization != null && headerAuthorization.startsWith(HEADER_BEARER)) {
+                String token = headerAuthorization.substring(7);
+                String username = jwtService.getClaimFromToken(token, Claims::getSubject);
+                String hashSession = jwtService.getClaimFromToken(token, Claims::getId);
+                String type = (String) jwtService.getClaimFromToken(token, "typ");
 
-            User user = userService.getByUsername(username);
+                if (!type.equals(TYPE_TOKEN)) {
+                    writeExceptionBody(response, EnumMainControllerAdviceMessage.INVALID_TOKEN.getMessage());
+                    return;
+                }
 
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    user, null, user.getAuthorities());
-            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                User user = userService.getByUsername(username);
 
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                if (!hashSession.equals(user.getHashSession())) {
+                    writeExceptionBody(response, EnumMainControllerAdviceMessage.SESSION_TOKEN_INVALID.getMessage());
+                    return;
+                }
+
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        user, null, user.getAuthorities());
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException ex) {
+            writeExceptionBody(response, EnumMainControllerAdviceMessage.TOKEN_EXPIRED.getMessage());
         }
+    }
 
-        filterChain.doFilter(request, response);
+    @SneakyThrows
+    private void writeExceptionBody(HttpServletResponse response, String message) {
+        HttpErrorDtoResponse error = HttpErrorDtoResponse.builder()
+                .httpStatus(HttpStatus.UNAUTHORIZED.value())
+                .code(EnumMainControllerAdviceCode.EXPIRED_TOKEN.getCode())
+                .message(message).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter()
+                .write(objectMapper.writeValueAsString(error));
     }
 }

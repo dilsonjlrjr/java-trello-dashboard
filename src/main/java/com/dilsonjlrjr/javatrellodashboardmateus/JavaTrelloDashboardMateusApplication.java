@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
 @Slf4j
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class })
 public class JavaTrelloDashboardMateusApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(JavaTrelloDashboardMateusApplication.class, args);
     }

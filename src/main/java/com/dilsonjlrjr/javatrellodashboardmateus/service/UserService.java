@@ -11,7 +11,7 @@ public class UserService {
                 .name("Dilson José")
                 .id(1L)
                 .username("dilsonjlrjr@gmail.com")
-                .password("e10adc3949ba59abbe56e057f20f883e")
+                .password("$2a$10$r.fqpqcVZ5ROXNP8pTdQeexAO0kUUm3pXk/OP203pBKi2nHMOoUVW")
                 .build();
     }
 }
