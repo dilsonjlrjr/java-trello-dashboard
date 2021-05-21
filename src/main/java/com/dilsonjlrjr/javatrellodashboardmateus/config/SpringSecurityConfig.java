@@ -50,8 +50,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth/login")
-                .permitAll()
+                .mvcMatchers(HttpMethod.POST, "/foo").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
