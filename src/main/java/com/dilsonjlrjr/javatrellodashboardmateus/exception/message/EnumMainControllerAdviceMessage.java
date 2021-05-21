@@ -10,7 +10,7 @@ public enum EnumMainControllerAdviceMessage {
 
     GENERIC_ERROR("GENERIC_ERROR"),
     BAD_CREDENTIALS("Bad credentials!"),
-    TOKEN_EXPIRED("Token expired!"),
+    EXPIRED_TOKEN("Token expired!"),
     SESSION_TOKEN_INVALID("Session token invalid!"),
     INVALID_TOKEN("Invalid Token!");
 

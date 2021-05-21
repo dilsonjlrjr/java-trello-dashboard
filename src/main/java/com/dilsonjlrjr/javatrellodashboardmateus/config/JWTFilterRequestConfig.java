@@ -33,6 +33,7 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
     private final JWTService jwtService;
 
     private static final String HEADER_BEARER = "Bearer ";
+    private static final String CLAIM_TYPE = "typ";
     private static final String TYPE_TOKEN = "token";
 
     @Autowired
@@ -53,17 +54,19 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
                 String token = headerAuthorization.substring(7);
                 String username = jwtService.getClaimFromToken(token, Claims::getSubject);
                 String hashSession = jwtService.getClaimFromToken(token, Claims::getId);
-                String type = (String) jwtService.getClaimFromToken(token, "typ");
+                String type = (String) jwtService.getClaimFromToken(token, CLAIM_TYPE);
 
                 if (!type.equals(TYPE_TOKEN)) {
-                    writeExceptionBody(response, EnumMainControllerAdviceMessage.INVALID_TOKEN.getMessage());
+                    writeExceptionBody(response, EnumMainControllerAdviceCode.INVALID_TOKEN.getCode(),
+                            EnumMainControllerAdviceMessage.INVALID_TOKEN.getMessage());
                     return;
                 }
 
                 User user = userService.getByUsername(username);
 
                 if (!hashSession.equals(user.getHashSession())) {
-                    writeExceptionBody(response, EnumMainControllerAdviceMessage.SESSION_TOKEN_INVALID.getMessage());
+                    writeExceptionBody(response, EnumMainControllerAdviceCode.SESSION_TOKEN_INVALID.getCode(),
+                            EnumMainControllerAdviceMessage.SESSION_TOKEN_INVALID.getMessage());
                     return;
                 }
 
@@ -76,15 +79,16 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ex) {
-            writeExceptionBody(response, EnumMainControllerAdviceMessage.TOKEN_EXPIRED.getMessage());
+            writeExceptionBody(response, EnumMainControllerAdviceCode.EXPIRED_TOKEN.getCode(),
+                    EnumMainControllerAdviceMessage.EXPIRED_TOKEN.getMessage());
         }
     }
 
     @SneakyThrows
-    private void writeExceptionBody(HttpServletResponse response, String message) {
+    private void writeExceptionBody(HttpServletResponse response, String code,String message) {
         HttpErrorDtoResponse error = HttpErrorDtoResponse.builder()
                 .httpStatus(HttpStatus.UNAUTHORIZED.value())
-                .code(EnumMainControllerAdviceCode.EXPIRED_TOKEN.getCode())
+                .code(code)
                 .message(message).build();
         ObjectMapper objectMapper = new ObjectMapper();
 
