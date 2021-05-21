@@ -13,7 +13,6 @@ public class FooResource {
 
     @GetMapping
     public ResponseEntity<String> getFoo() {
-        log.info("Rota foi chamada!");
         return ResponseEntity.ok("Trello dashboard Mateus");
     }
 }
