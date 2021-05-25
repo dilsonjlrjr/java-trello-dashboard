@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthDtoRequest {
+public class AuthLoginDtoRequest {
 
     @JsonProperty("username")
     @NotEmpty
