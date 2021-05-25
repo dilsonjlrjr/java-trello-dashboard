@@ -12,20 +12,20 @@
     </resultMap>
 
     <update id="updateSessionUser">
-        update 	users
+        update 	database.users
         set  	refresh_token = #{refreshToken}, hash_session = #{hashSession}
         where	id = #{id};
     </update>
 
     <select id="findByUsername" resultMap="resultMapUser">
         select  id, "name", username, "password", refresh_token, hash_session
-        from    users
+        from    database.users
         where   username = #{username}
     </select>
 
     <select id="findByRefreshTokenHashSession" resultMap="resultMapUser">
         select  id, "name", username, "password", refresh_token, hash_session
-        from    users
+        from    database.users
         where   refresh_token = #{refreshToken}
                 and hash_session = #{hashSession}
     </select>
