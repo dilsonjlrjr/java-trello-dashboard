@@ -18,7 +18,8 @@ spring:
 mybatis:
   mapper-locations: classpath*:**/mappers/*Mapper.xml
 ---
-spring.profiles: dev
+spring:
+  profiles: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/trello_scrum?currentSchema=database
     username: root
@@ -27,7 +28,8 @@ logging:
   level:
     com.dilsonjlrjr.javatrellodashboardmateus.mapper: trace
 ---
-spring.profiles: prod
+spring:
+  profiles: prod
   datasource:
     url: jdbc:postgresql://nlwajauqrbphuu:dad475ba541fcee30185d2cf3de72d28341b847ba572701bb2631cf52376c8e5@ec2-34-225-103-117.compute-1.amazonaws.com:5432/daq0qvf5kc3fv3?currentSchema=database
     username: root
