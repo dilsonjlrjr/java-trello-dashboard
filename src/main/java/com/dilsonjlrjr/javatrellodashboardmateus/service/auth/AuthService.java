@@ -1,8 +1,13 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.service.auth;
 
-import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.AuthDtoResponse;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.ServiceException;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumAuthServiceCode;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumAuthServiceMessage;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.AuthRefreshDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.AuthLoginDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.User;
 import com.dilsonjlrjr.javatrellodashboardmateus.service.UserService;
+import io.jsonwebtoken.Claims;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +18,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import sun.security.provider.MD5;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -34,6 +37,8 @@ public class AuthService implements UserDetailsService {
     private final Integer tokenTimeToExpire;
     private final Integer refreshTokenTimeToExpire;
 
+    private final static String TOKEN_TYPE_REFRESH = "refresh";
+
     @Autowired
     public AuthService(UserService userService,
                        JWTService jwtService,
@@ -48,14 +53,16 @@ public class AuthService implements UserDetailsService {
         this.refreshTokenTimeToExpire = refreshTokenTimeToExpire;
     }
 
-    public AuthDtoResponse authenticate(String username, String password) {
+    public AuthLoginDtoResponse authenticate(String username, String password) {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         User user =  userService.getByUsername(username);
         String hashSession = doCreateHashSession(username);
 
-        return doCreateAuthTokenResponse(user.getUsername(), hashSession, tokenTimeToExpire, refreshTokenTimeToExpire);
+        AuthLoginDtoResponse authLoginDtoResponse = doCreateAuthTokenResponse(user.getUsername(), hashSession, tokenTimeToExpire, refreshTokenTimeToExpire);
+        updateSessionUser(user.getId(), hashSession, authLoginDtoResponse.getRefreshToken());
+        return authLoginDtoResponse;
     }
 
     @SneakyThrows
@@ -65,18 +72,17 @@ public class AuthService implements UserDetailsService {
         String message = String.valueOf(nowDateTime.atZone(ZoneId.systemDefault()).toEpochSecond()).concat(username);
         md5encoder.update(message.getBytes(StandardCharsets.UTF_8), 0, message.length());
 
-//        return new BigInteger(1, md5encoder.digest()).toString(16);
-        return "e10adc3949ba59abbe56e057f20f883e";
+        return new BigInteger(1, md5encoder.digest()).toString(16);
     }
 
-    private AuthDtoResponse doCreateAuthTokenResponse(String sub,
-                                                      String hashSession,
-                                                      Integer timeExpirationToken,
-                                                      Integer timeExpirationRefreshToken) {
+    private AuthLoginDtoResponse doCreateAuthTokenResponse(String sub,
+                                                           String hashSession,
+                                                           Integer timeExpirationToken,
+                                                           Integer timeExpirationRefreshToken) {
         String token = jwtService.doCreateToken(sub, hashSession, timeExpirationToken);
         String refreshToken = jwtService.doCreateRefreshToken(sub, hashSession, timeExpirationRefreshToken);
 
-        return AuthDtoResponse.builder()
+        return AuthLoginDtoResponse.builder()
                 .tokenTimeExpiration(timeExpirationToken)
                 .token(token)
                 .refreshTokenTimeExpiration(timeExpirationRefreshToken)
@@ -87,5 +93,28 @@ public class AuthService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userService.getByUsername(username);
+    }
+
+    public void updateSessionUser(Long id, String hashSession, String refreshToken) {
+        userService.updateSessionUser(id, hashSession, refreshToken);
+    }
+
+    public AuthLoginDtoResponse refreshToken(AuthRefreshDtoRequest auth) {
+        String type = (String) jwtService.getClaimFromToken(auth.getRefreshToken(), "typ");
+        String hashSession = (String) jwtService.getClaimFromToken(auth.getRefreshToken(), "jti");
+
+        if (!type.equals(TOKEN_TYPE_REFRESH))
+            throw new ServiceException(EnumAuthServiceMessage.TOKEN_TYPE_INVALID.getMessage(),
+                    EnumAuthServiceCode.TOKEN_TYPE_INVALID.getCode());
+
+        User user = userService.getByUsername(auth.getRefreshToken(), hashSession);
+
+        hashSession = doCreateHashSession(user.getUsername());
+
+        AuthLoginDtoResponse authLoginDtoResponse = doCreateAuthTokenResponse(user.getUsername(),
+                hashSession, tokenTimeToExpire, refreshTokenTimeToExpire);
+        updateSessionUser(user.getId(), hashSession, authLoginDtoResponse.getRefreshToken());
+
+        return authLoginDtoResponse;
     }
 }

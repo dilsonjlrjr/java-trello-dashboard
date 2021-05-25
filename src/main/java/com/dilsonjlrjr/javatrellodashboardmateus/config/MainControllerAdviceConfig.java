@@ -1,5 +1,6 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.config;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.ServiceException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumMainControllerAdviceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumMainControllerAdviceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.HttpErrorDtoResponse;
@@ -10,6 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -84,7 +86,7 @@ public class MainControllerAdviceConfig {
         Map<String, String> errorMap = rawData.stream()
                 .collect(
                         Collectors.toMap(   FieldError::getField,
-                                            (item -> item.getDefaultMessage() != null ? item.getDefaultMessage() : "Erro desconhecido"), (o, o2) -> o));
+                                            (item -> item.getDefaultMessage() != null ? item.getDefaultMessage() : "Unknown error"), (o, o2) -> o));
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -92,7 +94,7 @@ public class MainControllerAdviceConfig {
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .code(EnumMainControllerAdviceCode.METHOD_ARGUMENT_NOT_VALID_EXCEPTION.getCode())
                         .data(errorMap)
-                        .message(ex.getMessage()).build());
+                        .message(EnumMainControllerAdviceMessage.FIELD_NOT_VALID.getMessage()).build());
     }
 
     @ExceptionHandler({ ConstraintViolationException.class })
@@ -113,6 +115,18 @@ public class MainControllerAdviceConfig {
                         .message(ex.getMessage()).build());
     }
 
+    @ExceptionHandler({InternalAuthenticationServiceException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleInternalAuthenticationServiceException(RuntimeException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.UNAUTHORIZED.value())
+                        .code(EnumMainControllerAdviceCode.USER_NOT_FOUND_BAD_CREDENTIALS.getCode())
+                        .message(EnumMainControllerAdviceMessage.USER_NOT_FOUND_BAD_CREDENTIALS.getMessage()).build());
+    }
+
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<HttpErrorDtoResponse> handleRunTimeException(RuntimeException ex) {
         log.error(ex.getMessage());
@@ -123,5 +137,17 @@ public class MainControllerAdviceConfig {
                         .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .code(EnumMainControllerAdviceCode.RUNTIME_EXCEPTION.getCode())
                         .message(EnumMainControllerAdviceMessage.GENERIC_ERROR.getMessage()).build());
+    }
+
+    @ExceptionHandler({ServiceException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleServiceException(ServiceException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.BAD_REQUEST.value())
+                        .code(ex.getCode())
+                        .message(ex.getMessage()).build());
     }
 }
