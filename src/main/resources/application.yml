@@ -17,6 +17,12 @@ spring:
     lazy-initialization: true
 mybatis:
   mapper-locations: classpath*:**/mappers/*Mapper.xml
+  type-aliases-package: com.dilsonjlrjr.javatrellodashboardmateus.model.entities
+pagehelper:
+  helperDialect: postgresql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
 ---
 spring:
   profiles: dev
