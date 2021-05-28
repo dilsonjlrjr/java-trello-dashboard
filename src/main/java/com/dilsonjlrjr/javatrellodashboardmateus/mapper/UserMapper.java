@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -15,4 +16,6 @@ public interface UserMapper {
     Optional<User> findByUsername(@Param("username") String username);
 
     Optional<User> findByRefreshTokenHashSession(@Param("refreshToken") String refreshToken, @Param("hashSession") String hashSession);
+
+    List<User> findAll();
 }

@@ -1,5 +1,6 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.model.entities;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.model.annotation.FieldName;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,16 +14,20 @@ import java.util.Collections;
 @AllArgsConstructor
 public class User implements UserDetails {
 
+    @FieldName("id")
     private Long id;
 
+    @FieldName("name")
     private String name;
 
+    @FieldName("email")
+    private String email;
+
+    @FieldName("username")
     private String username;
 
     private String password;
-
     private String refreshToken;
-
     private String hashSession;
 
     @Override
