@@ -47,6 +47,12 @@ public class UserService {
         userMapper.updateSessionUser(id, hashSession, refreshToken);
     }
 
+    public User getById(Long id) {
+        return userMapper.findById(id).orElseThrow(() -> new ServiceException(
+                EnumUserServiceMessage.ENTITY_NOT_FOUND.getMessage(),
+                EnumUserServiceCode.ENTITY_NOT_FOUND.getCode()));
+    }
+
     public User getByUsername(String refreshToken, String hashSession) {
         return userMapper.findByRefreshTokenHashSession(refreshToken, hashSession)
                 .orElseThrow(() -> new ServiceException(
@@ -62,5 +68,9 @@ public class UserService {
 
         return new PageInfo<>(users.parallelStream().map(Mappers.getMapper(UserDtoMapper.class)::userToUserDtoResponse)
                 .collect(Collectors.toList()));
+    }
+
+    public UserDtoResponse doFindByIdAndCreateDto(Long id) {
+        return Mappers.getMapper(UserDtoMapper.class).userToUserDtoResponse(this.getById(id));
     }
 }

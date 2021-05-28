@@ -18,4 +18,6 @@ public interface UserMapper {
     Optional<User> findByRefreshTokenHashSession(@Param("refreshToken") String refreshToken, @Param("hashSession") String hashSession);
 
     List<User> findAll();
+
+    Optional<User> findById(@Param("id") Long id);
 }

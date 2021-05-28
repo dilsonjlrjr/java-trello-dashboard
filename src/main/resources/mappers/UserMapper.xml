@@ -18,21 +18,28 @@
         where	id = #{id};
     </update>
 
-    <select id="findByUsername" resultMap="resultMapUser">
-        select  id, "name", username, "password", refresh_token, hash_session
+    <sql id="headerDefaultUser">
+        select  id, "name", username, email, "password", refresh_token, hash_session
         from    database.users
+    </sql>
+
+    <select id="findByUsername" resultMap="resultMapUser">
+        <include refid="headerDefaultUser" />
         where   username = #{username}
     </select>
 
     <select id="findByRefreshTokenHashSession" resultMap="resultMapUser">
-        select  id, "name", username, "password", email, refresh_token, hash_session
-        from    database.users
+        <include refid="headerDefaultUser" />
         where   refresh_token = #{refreshToken}
                 and hash_session = #{hashSession}
     </select>
 
     <select id="findAll" resultMap="resultMapUser">
-        select  id, "name", username, "password", email, refresh_token, hash_session
-        from    database.users
+        <include refid="headerDefaultUser" />
+    </select>
+
+    <select id="findById" resultMap="resultMapUser">
+        <include refid="headerDefaultUser" />
+        where   id = #{id}
     </select>
 </mapper>
