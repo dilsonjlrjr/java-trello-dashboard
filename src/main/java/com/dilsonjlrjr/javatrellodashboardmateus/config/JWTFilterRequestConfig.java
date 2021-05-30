@@ -35,6 +35,7 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
     private static final String HEADER_BEARER = "Bearer ";
     private static final String CLAIM_TYPE = "typ";
     private static final String TYPE_TOKEN = "token";
+    private static final String ID_USERNAME = "ID_USERNAME";
 
     @Autowired
     public JWTFilterRequestConfig(UserService userService,
@@ -69,6 +70,8 @@ public class JWTFilterRequestConfig extends OncePerRequestFilter {
                             EnumMainControllerAdviceMessage.SESSION_TOKEN_INVALID.getMessage());
                     return;
                 }
+
+                request.setAttribute(ID_USERNAME, user.getId());
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         user, null, user.getAuthorities());

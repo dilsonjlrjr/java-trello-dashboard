@@ -1,5 +1,6 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.config;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.SecurityResourceException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.ServiceException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumMainControllerAdviceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumMainControllerAdviceMessage;
@@ -147,6 +148,18 @@ public class MainControllerAdviceConfig {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(HttpErrorDtoResponse.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
+                        .code(ex.getCode())
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({SecurityResourceException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleServiceResourceException(SecurityResourceException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.UNAUTHORIZED.value())
                         .code(ex.getCode())
                         .message(ex.getMessage()).build());
     }
