@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper">
+
+    <resultMap id="resultmapProject" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project">
+        <id property="id" column="project_id" />
+        <result property="name" column="project_name" />
+        <result property="trelloToken" column="project_trello_token" />
+        <result property="trelloKey" column="project_trello_key" />
+        <association property="owner" column="user_id" resultMap="com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper.resultMapUser" />
+    </resultMap>
+
+    <sql id="fullFieldsProject">
+        table_projects.id				    as project_id,
+        table_projects."name"			    as project_name,
+        table_projects.trello_token		    as project_trello_token,
+        table_projects.trello_key		    as project_trello_key
+    </sql>
+
+    <select id="findByUserId" resultMap="resultmapProject">
+        select	<include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper.fullFieldsUser"/>,
+                <include refid="fullFieldsProject" />
+        from    "database".users table_users
+                inner join "database".projects table_projects on table_projects.id_users_owner = table_users.id
+    </select>
+</mapper>

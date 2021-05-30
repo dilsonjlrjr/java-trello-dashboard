@@ -5,8 +5,11 @@ import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumUserServiceC
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumUserServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.helper.DatabaseOrderUtils;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.UserDtoMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.UserDtoResponse;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.User;
 import com.github.pagehelper.PageInfo;
 import org.mapstruct.factory.Mappers;
@@ -26,10 +29,15 @@ public class UserService {
 
     private final DatabaseOrderUtils databaseOrderUtils;
 
+    private final ProjectService projectService;
+
     @Autowired
-    public UserService(UserMapper userMapper, DatabaseOrderUtils databaseOrderUtils) {
+    public UserService(UserMapper userMapper,
+                       DatabaseOrderUtils databaseOrderUtils,
+                       ProjectService projectService) {
         this.userMapper = userMapper;
         this.databaseOrderUtils = databaseOrderUtils;
+        this.projectService = projectService;
     }
 
     public List<User> getAll() {
@@ -72,5 +80,15 @@ public class UserService {
 
     public UserDtoResponse doFindByIdAndCreateDto(Long id) {
         return Mappers.getMapper(UserDtoMapper.class).userToUserDtoResponse(this.getById(id));
+    }
+
+    public PageInfo<ProjectDtoResponse> doFindProjectUserAndCreateDto(Pageable pageable, Long id) {
+        String orderByDatabase = databaseOrderUtils.doCreateStringOrdebyDatabase(pageable, Project.class);
+        startPage(pageable.getPageNumber(), pageable.getPageSize(), orderByDatabase);
+
+        List<Project> projects = projectService.getByUserId(id);
+
+        return new PageInfo<>(projects.parallelStream().map(Mappers.getMapper(ProjectDtoMapper.class)::projectsToProjectDtoResponse)
+                .collect(Collectors.toList()));
     }
 }

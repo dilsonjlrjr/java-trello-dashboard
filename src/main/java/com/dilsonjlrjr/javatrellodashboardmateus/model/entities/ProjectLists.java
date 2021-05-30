@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectsLists {
+public class ProjectLists {
 
-    private Projects project;
+    private Project project;
     private ListsType type;
     private String trelloId;
 }
