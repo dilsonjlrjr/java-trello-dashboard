@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -186,6 +187,18 @@ public class MainControllerAdviceConfig {
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(HttpErrorDtoResponse.builder()
                         .httpStatus(HttpStatus.METHOD_NOT_ALLOWED.value())
+                        .code(null)
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
                         .code(null)
                         .message(ex.getMessage()).build());
     }
