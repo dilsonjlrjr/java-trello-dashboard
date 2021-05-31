@@ -1,9 +1,9 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.service;
 
-import com.dilsonjlrjr.javatrellodashboardmateus.exception.ServiceException;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.EntityNotFoundException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumUserServiceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumUserServiceMessage;
-import com.dilsonjlrjr.javatrellodashboardmateus.helper.DatabaseOrderUtils;
+import com.dilsonjlrjr.javatrellodashboardmateus.util.DatabaseOrderUtils;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.UserDtoMapper;
@@ -46,7 +46,7 @@ public class UserService {
 
     public User getByUsername(String username) {
         return userMapper.findByUsername(username)
-                .orElseThrow(() -> new ServiceException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         EnumUserServiceMessage.ENTITY_NOT_FOUND.getMessage(),
                         EnumUserServiceCode.ENTITY_NOT_FOUND.getCode()));
     }
@@ -56,14 +56,14 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userMapper.findById(id).orElseThrow(() -> new ServiceException(
+        return userMapper.findById(id).orElseThrow(() -> new EntityNotFoundException(
                 EnumUserServiceMessage.ENTITY_NOT_FOUND.getMessage(),
                 EnumUserServiceCode.ENTITY_NOT_FOUND.getCode()));
     }
 
     public User getByUsername(String refreshToken, String hashSession) {
         return userMapper.findByRefreshTokenHashSession(refreshToken, hashSession)
-                .orElseThrow(() -> new ServiceException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         EnumUserServiceMessage.ENTITY_NOT_FOUND.getMessage(),
                         EnumUserServiceCode.ENTITY_NOT_FOUND.getCode()));
     }
@@ -88,7 +88,7 @@ public class UserService {
 
         List<Project> projects = projectService.getByUserId(id);
 
-        return new PageInfo<>(projects.parallelStream().map(Mappers.getMapper(ProjectDtoMapper.class)::projectsToProjectDtoResponse)
+        return new PageInfo<>(projects.parallelStream().map(Mappers.getMapper(ProjectDtoMapper.class)::projectToProjectDtoResponse)
                 .collect(Collectors.toList()));
     }
 }

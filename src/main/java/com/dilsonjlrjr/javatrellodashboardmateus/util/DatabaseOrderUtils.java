@@ -1,4 +1,4 @@
-package com.dilsonjlrjr.javatrellodashboardmateus.helper;
+package com.dilsonjlrjr.javatrellodashboardmateus.util;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.model.annotation.FieldName;
 import org.springframework.data.domain.Pageable;
