@@ -1,5 +1,7 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.config;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.EntityNotFoundException;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.SecurityResourceException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.ServiceException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumMainControllerAdviceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumMainControllerAdviceMessage;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -148,6 +152,54 @@ public class MainControllerAdviceConfig {
                 .body(HttpErrorDtoResponse.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .code(ex.getCode())
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({SecurityResourceException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleServiceResourceException(SecurityResourceException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.UNAUTHORIZED.value())
+                        .code(ex.getCode())
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.NOT_FOUND.value())
+                        .code(ex.getCode())
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.METHOD_NOT_ALLOWED.value())
+                        .code(null)
+                        .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
+                        .code(null)
                         .message(ex.getMessage()).build());
     }
 }
