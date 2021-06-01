@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectListsMapper">
+
+    <resultMap id="resultMapProjectLists" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.ProjectLists">
+        <result property="idTrello" column="projects_lists_id_trello" />
+        <collection property="project" resultMap="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.resultmapProject"/>
+        <collection property="listsType" resultMap="resultMapListsType" />
+    </resultMap>
+
+    <resultMap id="resultMapListsType" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.ListsType">
+        <id property="id" column="lists_types_id"/>
+        <result property="name" column="lists_types_name" />
+    </resultMap>
+
+    <sql id="fullFieldsListsType">
+        table_lists_types.id 				as lists_types_id,
+        table_lists_types."name" 			as lists_types_name
+    </sql>
+
+    <select id="getAllByProject" resultMap="resultMapProjectLists">
+        select  <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject"/>,
+                <include refid="fullFieldsListsType"/>,
+                table_projects_lists.id_trello 		as projects_lists_id_trello
+        from	"database".projects_lists table_projects_lists
+                inner join "database".projects table_projects on table_projects.id = table_projects_lists.id_projects
+                inner join "database".lists_types table_lists_types on table_lists_types.id = table_projects_lists.id_lists_types
+        where	table_projects_lists.id_projects = #{idProject}
+    </select>
+</mapper>

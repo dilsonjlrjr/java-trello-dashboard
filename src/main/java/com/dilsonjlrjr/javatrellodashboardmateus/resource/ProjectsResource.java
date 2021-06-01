@@ -1,6 +1,7 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.resource;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -53,5 +55,10 @@ public class ProjectsResource {
     @DeleteMapping(value = "/{id}")
     public void delete(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername) {
         projectService.doFindProjectAndDelete(id, idUsername);
+    }
+
+    @GetMapping(value = "/{id}/lists", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectListsDtoResponse>> getLists(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername) {
+        return ResponseEntity.ok(projectService.doFindProjectAndGetAllList(id, idUsername));
     }
 }
