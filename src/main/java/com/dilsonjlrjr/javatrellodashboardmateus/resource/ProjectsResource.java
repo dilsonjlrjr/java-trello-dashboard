@@ -33,48 +33,55 @@ public class ProjectsResource {
         this.projectService = projectService;
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDtoResponse> getById(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername) {
-        return ResponseEntity.ok(projectService.doFindProjectAndCreateDto(id, idUsername));
+    @GetMapping(value = "/{idProject}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProjectDtoResponse> getById(@PathVariable("idProject") Long idProject, @RequestAttribute(ID_USERNAME) Long idUsername) {
+        return ResponseEntity.ok(projectService.doFindProjectAndCreateDto(idProject, idUsername));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ResponseEntity<Void> save(@RequestBody @Valid ProjectDtoRequest project, @RequestAttribute(ID_USERNAME) Long idUsername) {
-        Long idInserted = projectService.doCreateProjectAndSave(idUsername, project);
+        Long idProjectInserted = projectService.doCreateProjectAndSave(idUsername, project);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}").buildAndExpand(idInserted).toUri();
+                .fromCurrentRequest().path("/{idProject}").buildAndExpand(idProjectInserted).toUri();
         return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.LOCATION, String.valueOf(location)).build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{idProject}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public void update(@PathVariable("id") Long id, @RequestBody @Valid ProjectDtoRequest project, @RequestAttribute(ID_USERNAME) Long idUsername) {
-        projectService.doCreateProjectAndUpdate(project, id, idUsername);
+    public void update(@PathVariable("idProject") Long idProject, @RequestBody @Valid ProjectDtoRequest projectDtoRequest, @RequestAttribute(ID_USERNAME) Long idUsername) {
+        projectService.doCreateProjectAndUpdate(projectDtoRequest, idProject, idUsername);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{idProject}")
     @Transactional
-    public void delete(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername) {
-        projectService.doFindProjectAndDelete(id, idUsername);
+    public void delete(@PathVariable("idProject") Long idProject, @RequestAttribute(ID_USERNAME) Long idUsername) {
+        projectService.doFindProjectAndDelete(idProject, idUsername);
     }
 
-    @GetMapping(value = "/{id}/lists", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectListsDtoResponse>> getLists(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername) {
-        return ResponseEntity.ok(projectService.doFindProjectAndGetAllList(id, idUsername));
+    @GetMapping(value = "/{idProject}/lists", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectListsDtoResponse>> getLists(@PathVariable("idProject") Long idProject, @RequestAttribute(ID_USERNAME) Long idUsername) {
+        return ResponseEntity.ok(projectService.doFindProjectAndGetAllList(idProject, idUsername));
     }
 
-    @PostMapping(value = "/{id}/lists", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{idProject}/lists", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public ResponseEntity<Void> saveLists(@PathVariable("id") Long id, @RequestAttribute(ID_USERNAME) Long idUsername,
+    public ResponseEntity<Void> saveLists(@PathVariable("idProject") Long idProject, @RequestAttribute(ID_USERNAME) Long idUsername,
                                           @RequestBody ProjectListsDtoRequest projectListsDtoRequest) {
-        projectService.doFindProjectAndCreateProjectLists(id, idUsername, projectListsDtoRequest);
+        projectService.doFindProjectAndCreateProjectLists(idProject, idUsername, projectListsDtoRequest);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}/lists").buildAndExpand(id).toUri();
+                .fromCurrentRequest().path("/{id}/lists").buildAndExpand(idProject).toUri();
         return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.LOCATION, location.toString()).build();
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping(value = "/{idProject}/lists/{idList}")
+    @Transactional
+    public void deleteLists(@PathVariable("idProject") Long idProject, @PathVariable("idList") Integer idList,
+                            @RequestAttribute(ID_USERNAME) Long idUsername) {
+        projectService.doFindProjectAndDeleteLists(idProject, idUsername, idList);
+    }
 }

@@ -27,13 +27,32 @@
                #{projectLists.idTrello});
     </insert>
 
+    <delete id="delete">
+        DELETE  FROM "database".projects_lists
+        WHERE   id_projects = #{projectLists.project.id}
+                AND id_lists_types = #{projectLists.listsType.id};
+    </delete>
+
+    <sql id="fullFieldProjectLists">
+        <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject"/>,
+        <include refid="fullFieldsListsType"/>,
+        table_projects_lists.id_trello 		as projects_lists_id_trello
+    </sql>
+
     <select id="getAllByProject" resultMap="resultMapProjectLists">
-        select  <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject"/>,
-                <include refid="fullFieldsListsType"/>,
-                table_projects_lists.id_trello 		as projects_lists_id_trello
+        select  <include refid="fullFieldProjectLists" />
         from	"database".projects_lists table_projects_lists
                 inner join "database".projects table_projects on table_projects.id = table_projects_lists.id_projects
                 inner join "database".lists_types table_lists_types on table_lists_types.id = table_projects_lists.id_lists_types
         where	table_projects_lists.id_projects = #{idProject}
+    </select>
+
+    <select id="getProjectListsByIdProjectAndIdList" resultMap="resultMapProjectLists">
+        select  <include refid="fullFieldProjectLists" />
+        from	"database".projects_lists table_projects_lists
+                inner join "database".projects table_projects on table_projects.id = table_projects_lists.id_projects
+                inner join "database".lists_types table_lists_types on table_lists_types.id = table_projects_lists.id_lists_types
+        where	table_projects_lists.id_projects = #{idProject}
+                and table_projects_lists.id_lists_types = #{idList}
     </select>
 </mapper>

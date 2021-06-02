@@ -115,4 +115,12 @@ public class ProjectService {
 
         projectListsService.doCreateProjectListAndSave(project, projectListsDtoRequest);
     }
+
+    public void doFindProjectAndDeleteLists(Long idProject, Long idUsername, Integer idList) {
+        Project project = getById(idProject);
+
+        checkIsOwnerProject(project, idUsername);
+
+        projectListsService.doFindProjectListAndDelete(project, idList);
+    }
 }
