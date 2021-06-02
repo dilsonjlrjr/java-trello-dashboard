@@ -2,9 +2,7 @@ package com.dilsonjlrjr.javatrellodashboardmateus.service;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.EntityNotFoundException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumProjectListsServiceCode;
-import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumProjectServiceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumProjectListsServiceMessage;
-import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumProjectServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectListsMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectListsDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;

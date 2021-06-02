@@ -9,5 +9,5 @@ public enum EnumAuthServiceMessage {
     TOKEN_TYPE_INVALID("Type token is invalid!");
 
     @Getter
-    private String message;
+    private final String message;
 }

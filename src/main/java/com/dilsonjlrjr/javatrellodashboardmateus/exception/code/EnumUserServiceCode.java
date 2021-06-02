@@ -9,5 +9,5 @@ public enum EnumUserServiceCode {
     ENTITY_NOT_FOUND("ENTITY_NOT_FOUND");
 
     @Getter
-    private String code;
+    private final String code;
 }

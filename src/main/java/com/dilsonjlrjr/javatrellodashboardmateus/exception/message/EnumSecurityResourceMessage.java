@@ -9,5 +9,5 @@ public enum EnumSecurityResourceMessage {
     UNAUTHORIZED_ACCESS_RESOURCE("You are not allowed to access this type of resource.");
 
     @Getter
-    private String message;
+    private final String message;
 }

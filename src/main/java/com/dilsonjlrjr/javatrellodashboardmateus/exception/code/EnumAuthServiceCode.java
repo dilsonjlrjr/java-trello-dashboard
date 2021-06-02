@@ -9,5 +9,5 @@ public enum EnumAuthServiceCode {
     TOKEN_TYPE_INVALID("TOKEN_TYPE_INVALID");
 
     @Getter
-    private String code;
+    private final String code;
 }

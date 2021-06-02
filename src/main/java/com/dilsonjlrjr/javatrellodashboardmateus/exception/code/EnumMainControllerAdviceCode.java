@@ -17,5 +17,5 @@ public enum EnumMainControllerAdviceCode {
     USER_NOT_FOUND_BAD_CREDENTIALS("USER_NOT_FOUND_BAD_CREDENTIALS");
 
     @Getter
-    private String code;
+    private final String code;
 }

@@ -7,7 +7,6 @@ import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.AuthRefreshDt
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.AuthLoginDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.User;
 import com.dilsonjlrjr.javatrellodashboardmateus.service.UserService;
-import io.jsonwebtoken.Claims;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,7 @@ public class AuthService implements UserDetailsService {
     private final Integer tokenTimeToExpire;
     private final Integer refreshTokenTimeToExpire;
 
-    private final static String TOKEN_TYPE_REFRESH = "refresh";
+    private static final String TOKEN_TYPE_REFRESH = "refresh";
 
     @Autowired
     public AuthService(UserService userService,
