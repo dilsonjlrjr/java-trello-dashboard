@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public enum EnumUserServiceCode {
+public enum EnumProjectListsServiceCode {
 
     ENTITY_NOT_FOUND("ENTITY_NOT_FOUND");
 

@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ProjectLists {
 
     private Project project;
-    private ListsType type;
-    private String trelloId;
+    private ListsType listsType;
+    private String idTrello;
 }

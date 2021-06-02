@@ -10,6 +10,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -201,5 +202,17 @@ public class MainControllerAdviceConfig {
                         .httpStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
                         .code(null)
                         .message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler({DuplicateKeyException.class})
+    public ResponseEntity<HttpErrorDtoResponse> handleDuplicateKeyException(DuplicateKeyException ex) {
+        log.error(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(HttpErrorDtoResponse.builder()
+                        .httpStatus(HttpStatus.CONFLICT.value())
+                        .code("DUPLICATE KEY")
+                        .message("Record already exists in database!").build());
     }
 }

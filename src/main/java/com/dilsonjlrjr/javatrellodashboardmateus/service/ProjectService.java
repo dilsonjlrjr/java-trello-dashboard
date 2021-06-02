@@ -8,23 +8,31 @@ import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumProjectSe
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumSecurityResourceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectDtoMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectListsDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.ProjectLists;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
 
     private final ProjectMapper projectMapper;
 
+    private final ProjectListsService projectListsService;
+
     @Autowired
-    public ProjectService(ProjectMapper projectMapper) {
+    public ProjectService(ProjectMapper projectMapper, ProjectListsService projectListsService) {
         this.projectMapper = projectMapper;
+        this.projectListsService = projectListsService;
     }
 
     public List<Project> getByUserId(Long id) {
@@ -60,9 +68,7 @@ public class ProjectService {
     public void doCreateProjectAndUpdate(ProjectDtoRequest projectDtoRequest, Long idProject, Long idUsername) {
         Project projectWillUpdate = getById(idProject);
 
-        if (!projectWillUpdate.getOwner().getId().equals(idUsername))
-            throw new SecurityResourceException(EnumSecurityResourceMessage.UNAUTHORIZED_ACCESS_RESOURCE.getMessage(),
-                    EnumSecurityResourceCode.UNAUTHORIZED_ACCESS_RESOURCE.getCode());
+        checkIsOwnerProject(projectWillUpdate, idUsername);
 
         Project project = Mappers.getMapper(ProjectDtoMapper.class).projectUpdateToProject(projectWillUpdate, projectDtoRequest);
 
@@ -76,14 +82,44 @@ public class ProjectService {
     public void doFindProjectAndDelete(Long idProject, Long idUsername) {
         Project project = getById(idProject);
 
-        if (!project.getOwner().getId().equals(idUsername))
-            throw new SecurityResourceException(EnumSecurityResourceMessage.UNAUTHORIZED_ACCESS_RESOURCE.getMessage(),
-                    EnumSecurityResourceCode.UNAUTHORIZED_ACCESS_RESOURCE.getCode());
+        checkIsOwnerProject(project, idUsername);
 
         delete(project);
     }
 
     private void delete(Project project) {
         projectMapper.delete(project.getId());
+    }
+
+    public List<ProjectListsDtoResponse> doFindProjectAndGetAllList(Long idProject, Long idUsername) {
+        Project project = getById(idProject);
+
+        checkIsOwnerProject(project, idUsername);
+
+        List<ProjectLists> projectLists = projectListsService.getAllByProject(idProject);
+
+        return projectLists.parallelStream().map(Mappers.getMapper(ProjectListsDtoMapper.class)::projectListsToProjectListsDtoResponse).collect(Collectors.toList());
+    }
+
+    public void checkIsOwnerProject(Project project, Long idUsername) {
+        if (!project.getOwner().getId().equals(idUsername))
+            throw new SecurityResourceException(EnumSecurityResourceMessage.UNAUTHORIZED_ACCESS_RESOURCE.getMessage(),
+                    EnumSecurityResourceCode.UNAUTHORIZED_ACCESS_RESOURCE.getCode());
+    }
+
+    public void doFindProjectAndCreateProjectLists(Long idProject, Long idUsername, ProjectListsDtoRequest projectListsDtoRequest) {
+        Project project = getById(idProject);
+
+        checkIsOwnerProject(project, idUsername);
+
+        projectListsService.doCreateProjectListAndSave(project, projectListsDtoRequest);
+    }
+
+    public void doFindProjectAndDeleteLists(Long idProject, Long idUsername, Integer idList) {
+        Project project = getById(idProject);
+
+        checkIsOwnerProject(project, idUsername);
+
+        projectListsService.doFindProjectListAndDelete(project, idList);
     }
 }

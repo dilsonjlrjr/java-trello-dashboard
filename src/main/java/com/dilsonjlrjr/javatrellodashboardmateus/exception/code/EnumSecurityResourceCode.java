@@ -9,5 +9,5 @@ public enum EnumSecurityResourceCode {
     UNAUTHORIZED_ACCESS_RESOURCE("UNAUTHORIZED_ACCESS_RESOURCE");
 
     @Getter
-    private String code;
+    private final String code;
 }
