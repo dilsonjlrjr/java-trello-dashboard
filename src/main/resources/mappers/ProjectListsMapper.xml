@@ -18,6 +18,15 @@
         table_lists_types."name" 			as lists_types_name
     </sql>
 
+    <insert id="save">
+        INSERT INTO "database".projects_lists
+            (id_projects, id_lists_types, id_trello)
+        VALUES(
+               #{projectLists.project.id},
+               #{projectLists.listsType.id},
+               #{projectLists.idTrello});
+    </insert>
+
     <select id="getAllByProject" resultMap="resultMapProjectLists">
         select  <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject"/>,
                 <include refid="fullFieldsListsType"/>,

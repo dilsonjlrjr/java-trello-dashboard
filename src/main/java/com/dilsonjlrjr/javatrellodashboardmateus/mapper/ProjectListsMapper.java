@@ -11,4 +11,6 @@ import java.util.List;
 @Mapper
 public interface ProjectListsMapper {
     List<ProjectLists> getAllByProject(@Param("idProject") Long idProject);
+
+    void save(@Param("projectLists") ProjectLists projectLists);
 }

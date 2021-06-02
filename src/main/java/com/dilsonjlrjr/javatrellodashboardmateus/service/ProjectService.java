@@ -10,6 +10,7 @@ import com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectListsDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project;
@@ -105,5 +106,13 @@ public class ProjectService {
         if (!project.getOwner().getId().equals(idUsername))
             throw new SecurityResourceException(EnumSecurityResourceMessage.UNAUTHORIZED_ACCESS_RESOURCE.getMessage(),
                     EnumSecurityResourceCode.UNAUTHORIZED_ACCESS_RESOURCE.getCode());
+    }
+
+    public void doFindProjectAndCreateProjectLists(Long idProject, Long idUsername, ProjectListsDtoRequest projectListsDtoRequest) {
+        Project project = getById(idProject);
+
+        checkIsOwnerProject(project, idUsername);
+
+        projectListsService.doCreateProjectListAndSave(project, projectListsDtoRequest);
     }
 }
