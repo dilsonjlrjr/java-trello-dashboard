@@ -4,7 +4,7 @@
 
     <resultMap id="resultMapProjectLists" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.ProjectLists">
         <result property="idTrello" column="projects_lists_id_trello" />
-        <collection property="project" resultMap="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.resultmapProject"/>
+        <collection property="project" resultMap="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.resultMapProject"/>
         <collection property="listsType" resultMap="resultMapListsType" />
     </resultMap>
 

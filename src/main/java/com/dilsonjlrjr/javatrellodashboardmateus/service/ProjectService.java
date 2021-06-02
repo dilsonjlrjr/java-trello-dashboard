@@ -9,18 +9,26 @@ import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumSecurityR
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectListsDtoMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.SprintDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
-import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.SprintDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.ProjectLists;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Sprint;
+import com.dilsonjlrjr.javatrellodashboardmateus.util.DatabaseOrderUtils;
+import com.github.pagehelper.PageInfo;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.github.pagehelper.page.PageMethod.startPage;
 
 @Service
 public class ProjectService {
@@ -29,10 +37,19 @@ public class ProjectService {
 
     private final ProjectListsService projectListsService;
 
+    private final SprintService sprintService;
+
+    private final DatabaseOrderUtils databaseOrderUtils;
+
     @Autowired
-    public ProjectService(ProjectMapper projectMapper, ProjectListsService projectListsService) {
+    public ProjectService(ProjectMapper projectMapper,
+                          ProjectListsService projectListsService,
+                          SprintService sprintService,
+                          DatabaseOrderUtils databaseOrderUtils) {
         this.projectMapper = projectMapper;
         this.projectListsService = projectListsService;
+        this.sprintService = sprintService;
+        this.databaseOrderUtils = databaseOrderUtils;
     }
 
     public List<Project> getByUserId(Long id) {
@@ -121,5 +138,17 @@ public class ProjectService {
         checkIsOwnerProject(project, idUsername);
 
         projectListsService.doFindProjectListAndDelete(project, idList);
+    }
+
+    public PageInfo<SprintDtoResponse> doFindProjectAndGetAllSprints(Long idProject, Long idUsername, Pageable pageable) {
+        Project project = getById(idProject);
+        checkIsOwnerProject(project, idUsername);
+
+        String orderByDatabase = databaseOrderUtils.doCreateStringOrdebyDatabase(pageable, Sprint.class);
+        startPage(pageable.getPageNumber(), pageable.getPageSize(), orderByDatabase);
+
+        List<Sprint> sprints = sprintService.getAll(idProject);
+
+        return new PageInfo<>(sprints.parallelStream().map(Mappers.getMapper(SprintDtoMapper.class)::sprintToSprintDtoResponse).collect(Collectors.toList()));
     }
 }

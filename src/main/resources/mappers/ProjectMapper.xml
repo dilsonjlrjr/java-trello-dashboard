@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper">
 
-    <resultMap id="resultmapProject" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project">
+    <resultMap id="resultMapProject" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Project">
         <id property="id" column="project_id" />
         <result property="name" column="project_name" />
         <result property="trelloToken" column="project_trello_token" />
@@ -30,14 +30,14 @@
         where   id = #{id};
     </delete>
 
-    <select id="findByUserId" resultMap="resultmapProject">
+    <select id="findByUserId" resultMap="resultMapProject">
         select	<include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper.fullFieldsUser"/>,
                 <include refid="fullFieldsProject" />
         from    "database".users table_users
                 inner join "database".projects table_projects on table_projects.id_users_owner = table_users.id
     </select>
 
-    <select id="findById" resultMap="resultmapProject">
+    <select id="findById" resultMap="resultMapProject">
         select	<include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.UserMapper.fullFieldsUser"/>,
                 <include refid="fullFieldsProject" />
         from    "database".users table_users
