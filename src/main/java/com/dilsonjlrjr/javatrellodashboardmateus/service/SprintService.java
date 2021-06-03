@@ -1,5 +1,10 @@
 package com.dilsonjlrjr.javatrellodashboardmateus.service;
 
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.EntityNotFoundException;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumSprintServiceCode;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumUserServiceCode;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumSprintServiceMessage;
+import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumUserServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.SprintMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Sprint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +24,11 @@ public class SprintService {
 
     public List<Sprint> getAll(Long idProject) {
         return sprintMapper.getAll(idProject);
+    }
+
+    public Sprint getById(Long idProject, Long idSprint) {
+        return sprintMapper.getById(idProject, idSprint).orElseThrow(() -> new EntityNotFoundException(
+                EnumSprintServiceMessage.ENTITY_NOT_FOUND.getMessage(),
+                EnumSprintServiceCode.ENTITY_NOT_FOUND.getCode()));
     }
 }

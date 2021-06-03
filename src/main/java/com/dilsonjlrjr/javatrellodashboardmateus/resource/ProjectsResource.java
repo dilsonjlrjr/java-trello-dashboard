@@ -93,4 +93,11 @@ public class ProjectsResource {
                                                                      @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(projectService.doFindProjectAndGetAllSprints(idProject, idUsername, pageable));
     }
+
+    @GetMapping(value = "/{idProject}/sprints/{idSprint}")
+    public ResponseEntity<SprintDtoResponse> getSprintById(@PathVariable("idProject") Long idProject,
+                                                           @PathVariable("idSprint") Long idSprint,
+                                                           @RequestAttribute(ID_USERNAME) Long idUsername) {
+        return ResponseEntity.ok(projectService.doFindProjectAndCreateSprintDtoResponse(idProject, idUsername, idSprint));
+    }
 }

@@ -32,4 +32,13 @@
                 inner join "database".projects table_projects on table_projects.id = table_sprints.id_projects
         where   table_sprints.id_projects = #{idProject}
     </select>
+
+    <select id="getById" resultMap="resultMapSprint">
+        select  <include refid="fullFieldsSprint" />,
+                <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject" />
+        from	"database".sprints table_sprints
+                inner join "database".projects table_projects on table_projects.id = table_sprints.id_projects
+        where   table_sprints.id_projects = #{idProject}
+                and table_sprints.id = #{idSprint}
+    </select>
 </mapper>

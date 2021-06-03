@@ -151,4 +151,11 @@ public class ProjectService {
 
         return new PageInfo<>(sprints.parallelStream().map(Mappers.getMapper(SprintDtoMapper.class)::sprintToSprintDtoResponse).collect(Collectors.toList()));
     }
+
+    public SprintDtoResponse doFindProjectAndCreateSprintDtoResponse(Long idProject, Long idUsername, Long idSprint) {
+        Project project = getById(idProject);
+        checkIsOwnerProject(project, idUsername);
+
+        return Mappers.getMapper(SprintDtoMapper.class).sprintToSprintDtoResponse(sprintService.getById(idProject, idSprint));
+    }
 }
