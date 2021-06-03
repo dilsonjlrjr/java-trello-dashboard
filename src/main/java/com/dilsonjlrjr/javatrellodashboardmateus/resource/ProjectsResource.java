@@ -2,6 +2,7 @@ package com.dilsonjlrjr.javatrellodashboardmateus.resource;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.SprintDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.SprintDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
@@ -99,5 +100,16 @@ public class ProjectsResource {
                                                            @PathVariable("idSprint") Long idSprint,
                                                            @RequestAttribute(ID_USERNAME) Long idUsername) {
         return ResponseEntity.ok(projectService.doFindProjectAndCreateSprintDtoResponse(idProject, idUsername, idSprint));
+    }
+
+    @PostMapping(value = "/{idProject}/sprints")
+    public ResponseEntity<Void> saveSprints(@PathVariable("idProject") Long idProject,
+                                            @RequestAttribute(ID_USERNAME) Long idUsername,
+                                            @RequestBody @Valid SprintDtoRequest sprintDtoRequest) {
+        Long idSprintInserted = projectService.doFindProjectAndCreateSprint(sprintDtoRequest, idProject, idUsername);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}").buildAndExpand(idSprintInserted).toUri();
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.LOCATION, location.toString()).build();
     }
 }

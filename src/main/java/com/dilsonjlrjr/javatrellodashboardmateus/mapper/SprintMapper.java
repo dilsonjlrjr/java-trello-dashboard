@@ -15,4 +15,6 @@ public interface SprintMapper {
     List<Sprint> getAll(@Param("idProject") Long idProject);
 
     Optional<Sprint> getById(@Param("idProject") Long idProject, @Param("idSprint") Long idSprint);
+
+    void save(@Param("sprint") Sprint sprint);
 }

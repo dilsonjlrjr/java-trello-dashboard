@@ -12,6 +12,7 @@ import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.ProjectListsDt
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.SprintDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.SprintDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.SprintDtoResponse;
@@ -157,5 +158,12 @@ public class ProjectService {
         checkIsOwnerProject(project, idUsername);
 
         return Mappers.getMapper(SprintDtoMapper.class).sprintToSprintDtoResponse(sprintService.getById(idProject, idSprint));
+    }
+
+    public Long doFindProjectAndCreateSprint(SprintDtoRequest sprintDtoRequest, Long idProject, Long idUsername) {
+        Project project = getById(idProject);
+        checkIsOwnerProject(project, idUsername);
+
+        return sprintService.doCreateSprintAndSave(sprintDtoRequest, idProject);
     }
 }

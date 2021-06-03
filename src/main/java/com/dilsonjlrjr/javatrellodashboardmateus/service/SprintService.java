@@ -6,7 +6,10 @@ import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumUserServiceC
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumSprintServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumUserServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.SprintMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.SprintDtoMapper;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.SprintDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Sprint;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +33,12 @@ public class SprintService {
         return sprintMapper.getById(idProject, idSprint).orElseThrow(() -> new EntityNotFoundException(
                 EnumSprintServiceMessage.ENTITY_NOT_FOUND.getMessage(),
                 EnumSprintServiceCode.ENTITY_NOT_FOUND.getCode()));
+    }
+
+    public Long doCreateSprintAndSave(SprintDtoRequest sprintDtoRequest, Long idProject) {
+        Sprint sprint = Mappers.getMapper(SprintDtoMapper.class).sprintDtoRequestToSprint(sprintDtoRequest, idProject);
+
+        sprintMapper.save(sprint);
+        return sprint.getId();
     }
 }

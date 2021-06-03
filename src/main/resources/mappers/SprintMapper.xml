@@ -25,6 +25,21 @@
 		table_sprints.hours_per_day			as sprints_hours_per_day
     </sql>
 
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into "database".sprints
+                    (id_projects, "name", goal, "start", "end", delivery, number_work, hours_per_day)
+        values (
+                #{sprint.project.id},
+                #{sprint.name},
+                #{sprint.goal},
+                #{sprint.start},
+                #{sprint.end},
+                #{sprint.delivery},
+                #{sprint.numberWork},
+                #{sprint.hoursPerDay});
+
+    </insert>
+
     <select id="getAll" resultMap="resultMapSprint">
         select  <include refid="fullFieldsSprint" />,
                 <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject" />
