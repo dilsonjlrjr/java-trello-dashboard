@@ -2,10 +2,15 @@ package com.dilsonjlrjr.javatrellodashboardmateus.resource;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectDtoRequest;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.ProjectListsDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.SprintDtoRequest;
+import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.SprintDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.response.ProjectListsDtoResponse;
 import com.dilsonjlrjr.javatrellodashboardmateus.service.ProjectService;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,7 +52,7 @@ public class ProjectsResource {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping(value = "/{idProject}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{idProject}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public void update(@PathVariable("idProject") Long idProject, @RequestBody @Valid ProjectDtoRequest projectDtoRequest, @RequestAttribute(ID_USERNAME) Long idUsername) {
         projectService.doCreateProjectAndUpdate(projectDtoRequest, idProject, idUsername);
@@ -81,5 +86,50 @@ public class ProjectsResource {
     public void deleteLists(@PathVariable("idProject") Long idProject, @PathVariable("idList") Integer idList,
                             @RequestAttribute(ID_USERNAME) Long idUsername) {
         projectService.doFindProjectAndDeleteLists(idProject, idUsername, idList);
+    }
+
+    @GetMapping(value = "/{idProject}/sprints", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PageInfo<SprintDtoResponse>> getAllSprints(@PathVariable("idProject") Long idProject,
+                                                                     @RequestAttribute(ID_USERNAME) Long idUsername,
+                                                                     @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectService.doFindProjectAndGetAllSprints(idProject, idUsername, pageable));
+    }
+
+    @GetMapping(value = "/{idProject}/sprints/{idSprint}")
+    public ResponseEntity<SprintDtoResponse> getSprintById(@PathVariable("idProject") Long idProject,
+                                                           @PathVariable("idSprint") Long idSprint,
+                                                           @RequestAttribute(ID_USERNAME) Long idUsername) {
+        return ResponseEntity.ok(projectService.doFindProjectAndCreateSprintDtoResponse(idProject, idUsername, idSprint));
+    }
+
+    @PostMapping(value = "/{idProject}/sprints", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ResponseEntity<Void> saveSprints(@PathVariable("idProject") Long idProject,
+                                            @RequestAttribute(ID_USERNAME) Long idUsername,
+                                            @RequestBody @Valid SprintDtoRequest sprintDtoRequest) {
+        Long idSprintInserted = projectService.doFindProjectAndCreateSprint(sprintDtoRequest, idProject, idUsername);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}").buildAndExpand(idSprintInserted).toUri();
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.LOCATION, location.toString()).build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(value = "/{idProject}/sprints/{idSprint}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public void updateSprints(@PathVariable("idProject") Long idProject,
+                              @PathVariable("idSprint") Long idSprint,
+                              @RequestAttribute(ID_USERNAME) Long idUsername,
+                              @RequestBody @Valid SprintDtoRequest sprintDtoRequest) {
+        projectService.doFindProjectAndUpdateSprint(idProject, idSprint, idUsername, sprintDtoRequest);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping(value = "/{idProject}/sprints/{idSprint}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public void deleteSprints(@PathVariable("idProject") Long idProject,
+                              @PathVariable("idSprint") Long idSprint,
+                              @RequestAttribute(ID_USERNAME) Long idUsername) {
+        projectService.doFindProjectAndDeleteSprint(idProject, idSprint, idUsername);
     }
 }

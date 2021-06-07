@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dilsonjlrjr.javatrellodashboardmateus.mapper.SprintMapper">
+
+    <resultMap id="resultMapSprint" type="com.dilsonjlrjr.javatrellodashboardmateus.model.entities.Sprint">
+        <id property="id" column="sprints_id" />
+        <result property="name" column="sprints_name" />
+        <result property="goal" column="sprints_goal" />
+        <result property="start" column="sprints_start" />
+        <result property="end" column="sprints_end" />
+        <result property="delivery" column="sprints_delivery" />
+        <result property="numberWork" column="sprints_number_work" />
+        <result property="hoursPerDay" column="sprints_hours_per_day" />
+        <collection property="project" resultMap="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.resultMapProject" />
+    </resultMap>
+
+    <sql id="fullFieldsSprint">
+        table_sprints.id					as sprints_id,
+		table_sprints."name"				as sprints_name,
+		table_sprints.goal					as sprints_goal,
+		table_sprints."start"				as sprints_start,
+		table_sprints."end"					as sprints_end,
+		table_sprints.delivery				as sprints_delivery,
+		table_sprints.number_work			as sprints_number_work,
+		table_sprints.hours_per_day			as sprints_hours_per_day
+    </sql>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into "database".sprints
+                    (id_projects, "name", goal, "start", "end", delivery, number_work, hours_per_day)
+        values (
+                #{sprint.project.id},
+                #{sprint.name},
+                #{sprint.goal},
+                #{sprint.start},
+                #{sprint.end},
+                #{sprint.delivery},
+                #{sprint.numberWork},
+                #{sprint.hoursPerDay});
+
+    </insert>
+
+    <update id="update">
+        UPDATE  "database".sprints
+        SET     name = #{sprint.name},
+                goal = #{sprint.goal},
+                "start" = #{sprint.start},
+                "end" = #{sprint.end},
+                delivery = #{sprint.delivery},
+                number_work = #{sprint.numberWork},
+                hours_per_day = #{sprint.hoursPerDay}
+        where   id_projects = #{sprint.project.id}
+                and id = #{sprint.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM "database".sprints
+        WHERE id = #{sprint.id};
+    </delete>
+
+    <select id="getAll" resultMap="resultMapSprint">
+        select  <include refid="fullFieldsSprint" />,
+                <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject" />
+        from	"database".sprints table_sprints
+                inner join "database".projects table_projects on table_projects.id = table_sprints.id_projects
+        where   table_sprints.id_projects = #{idProject}
+    </select>
+
+    <select id="getById" resultMap="resultMapSprint">
+        select  <include refid="fullFieldsSprint" />,
+                <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject" />
+        from	"database".sprints table_sprints
+                inner join "database".projects table_projects on table_projects.id = table_sprints.id_projects
+        where   table_sprints.id_projects = #{idProject}
+                and table_sprints.id = #{idSprint}
+    </select>
+</mapper>
