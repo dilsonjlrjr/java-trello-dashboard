@@ -40,6 +40,24 @@
 
     </insert>
 
+    <update id="update">
+        UPDATE  "database".sprints
+        SET     name = #{sprint.name},
+                goal = #{sprint.goal},
+                "start" = #{sprint.start},
+                "end" = #{sprint.end},
+                delivery = #{sprint.delivery},
+                number_work = #{sprint.numberWork},
+                hours_per_day = #{sprint.hoursPerDay}
+        where   id_projects = #{sprint.project.id}
+                and id = #{sprint.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM "database".sprints
+        WHERE id = #{sprint.id};
+    </delete>
+
     <select id="getAll" resultMap="resultMapSprint">
         select  <include refid="fullFieldsSprint" />,
                 <include refid="com.dilsonjlrjr.javatrellodashboardmateus.mapper.ProjectMapper.fullFieldsProject" />

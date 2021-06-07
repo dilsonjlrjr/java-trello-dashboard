@@ -17,4 +17,8 @@ public interface SprintMapper {
     Optional<Sprint> getById(@Param("idProject") Long idProject, @Param("idSprint") Long idSprint);
 
     void save(@Param("sprint") Sprint sprint);
+
+    void update(@Param("sprint") Sprint sprint);
+
+    void delete(@Param("sprint") Sprint sprint);
 }

@@ -135,7 +135,6 @@ public class ProjectService {
 
     public void doFindProjectAndDeleteLists(Long idProject, Long idUsername, Integer idList) {
         Project project = getById(idProject);
-
         checkIsOwnerProject(project, idUsername);
 
         projectListsService.doFindProjectListAndDelete(project, idList);
@@ -165,5 +164,19 @@ public class ProjectService {
         checkIsOwnerProject(project, idUsername);
 
         return sprintService.doCreateSprintAndSave(sprintDtoRequest, idProject);
+    }
+
+    public void doFindProjectAndUpdateSprint(Long idProject, Long idSprint, Long idUsername, SprintDtoRequest sprintDtoRequest) {
+        Project project = getById(idProject);
+        checkIsOwnerProject(project, idUsername);
+
+        sprintService.doFindSprintAndUpdate(project.getId(), idSprint, sprintDtoRequest);
+    }
+
+    public void doFindProjectAndDeleteSprint(Long idProject, Long idSprint, Long idUsername) {
+        Project project = getById(idProject);
+        checkIsOwnerProject(project, idUsername);
+
+        sprintService.doFindSprintAndDelete(project.getId(), idSprint);
     }
 }

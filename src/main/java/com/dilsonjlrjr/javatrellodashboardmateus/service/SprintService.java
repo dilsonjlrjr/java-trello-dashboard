@@ -2,9 +2,7 @@ package com.dilsonjlrjr.javatrellodashboardmateus.service;
 
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.EntityNotFoundException;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumSprintServiceCode;
-import com.dilsonjlrjr.javatrellodashboardmateus.exception.code.EnumUserServiceCode;
 import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumSprintServiceMessage;
-import com.dilsonjlrjr.javatrellodashboardmateus.exception.message.EnumUserServiceMessage;
 import com.dilsonjlrjr.javatrellodashboardmateus.mapper.SprintMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.mapper.SprintDtoMapper;
 import com.dilsonjlrjr.javatrellodashboardmateus.model.dto.request.SprintDtoRequest;
@@ -40,5 +38,18 @@ public class SprintService {
 
         sprintMapper.save(sprint);
         return sprint.getId();
+    }
+
+    public void doFindSprintAndUpdate(Long idProject, Long idSprint, SprintDtoRequest sprintDtoRequest) {
+        Sprint sprintWillUpdate = getById(idProject, idSprint);
+        sprintWillUpdate = Mappers.getMapper(SprintDtoMapper.class).sprintDtoRequestToSprintMerge(sprintWillUpdate, sprintDtoRequest);
+
+        sprintMapper.update(sprintWillUpdate);
+    }
+
+    public void doFindSprintAndDelete(Long idProject, Long idSprint) {
+        Sprint sprintWillDelete = getById(idProject, idSprint);
+
+        sprintMapper.delete(sprintWillDelete);
     }
 }

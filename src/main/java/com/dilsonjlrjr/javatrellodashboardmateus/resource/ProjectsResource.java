@@ -52,7 +52,7 @@ public class ProjectsResource {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping(value = "/{idProject}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{idProject}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public void update(@PathVariable("idProject") Long idProject, @RequestBody @Valid ProjectDtoRequest projectDtoRequest, @RequestAttribute(ID_USERNAME) Long idUsername) {
         projectService.doCreateProjectAndUpdate(projectDtoRequest, idProject, idUsername);
@@ -102,7 +102,8 @@ public class ProjectsResource {
         return ResponseEntity.ok(projectService.doFindProjectAndCreateSprintDtoResponse(idProject, idUsername, idSprint));
     }
 
-    @PostMapping(value = "/{idProject}/sprints")
+    @PostMapping(value = "/{idProject}/sprints", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
     public ResponseEntity<Void> saveSprints(@PathVariable("idProject") Long idProject,
                                             @RequestAttribute(ID_USERNAME) Long idUsername,
                                             @RequestBody @Valid SprintDtoRequest sprintDtoRequest) {
@@ -111,5 +112,24 @@ public class ProjectsResource {
                 .fromCurrentRequest().path("/{id}").buildAndExpand(idSprintInserted).toUri();
 
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.LOCATION, location.toString()).build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(value = "/{idProject}/sprints/{idSprint}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public void updateSprints(@PathVariable("idProject") Long idProject,
+                              @PathVariable("idSprint") Long idSprint,
+                              @RequestAttribute(ID_USERNAME) Long idUsername,
+                              @RequestBody @Valid SprintDtoRequest sprintDtoRequest) {
+        projectService.doFindProjectAndUpdateSprint(idProject, idSprint, idUsername, sprintDtoRequest);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping(value = "/{idProject}/sprints/{idSprint}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public void deleteSprints(@PathVariable("idProject") Long idProject,
+                              @PathVariable("idSprint") Long idSprint,
+                              @RequestAttribute(ID_USERNAME) Long idUsername) {
+        projectService.doFindProjectAndDeleteSprint(idProject, idSprint, idUsername);
     }
 }
