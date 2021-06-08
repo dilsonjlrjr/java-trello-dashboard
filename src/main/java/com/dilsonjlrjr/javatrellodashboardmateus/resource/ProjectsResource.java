@@ -48,7 +48,7 @@ public class ProjectsResource {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{idProject}").buildAndExpand(idProjectInserted).toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.LOCATION, String.valueOf(location)).build();
+        return ResponseEntity.created(location).build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -77,7 +77,7 @@ public class ProjectsResource {
         projectService.doFindProjectAndCreateProjectLists(idProject, idUsername, projectListsDtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}/lists").buildAndExpand(idProject).toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.LOCATION, location.toString()).build();
+        return ResponseEntity.created(location).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -111,7 +111,7 @@ public class ProjectsResource {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}").buildAndExpand(idSprintInserted).toUri();
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.LOCATION, location.toString()).build();
+        return ResponseEntity.created(location).build();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
