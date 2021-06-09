@@ -4,7 +4,7 @@ spring:
   application:
     name: Trello Scrum
     description: "API Trello Scrum"
-    version: 0.0.1
+    version: 0.0.2
     jwt:
       secret: TQczCdDxCAkbARkEYhXqDRSNe5qBV3S2jreQfKbQx86KKX66y52h8
       timeToExpire:
